@@ -1,5 +1,9 @@
 import API from './api'
+import deepstreamClient from 'deepstream.io-client-js'
 
+window.ds = deepstreamClient('localhost:3000', {path: '/ds'})
+
+ds.login()
 
 window._dev = {
   login(username, password) {

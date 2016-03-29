@@ -11,6 +11,12 @@ import api from './api'
 
 export const app = express()
 
+// app.get('*', (req, res, next) => {
+//   console.log(req.cookies)
+
+//   next()
+// })
+
 app.use(bodyParser.json())
 
 app.use(session)
@@ -26,7 +32,7 @@ const webpackDevConfig = require('../webpack.config.development')
 
 app.use(webpackMiddleware(webpack(webpackDevConfig), {
   publicPath: '/',
-  contentBase: '../client/',
+  contentBase: path.join(__dirname, '../client'),
   inline: true,
   hot: true,
   stats: {
