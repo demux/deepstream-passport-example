@@ -20,6 +20,8 @@ ds.set('storage', new RethinkDBStorageConnector({
 
 ds.set('permissionHandler', {
   async isValidUser(connectionData, authData, callback) {
+    const t0 = (new Date()).getMilliseconds()
+
     let req = new MockExpressRequest({
       method: 'GET',
       url: '/ds',
@@ -32,15 +34,17 @@ ds.set('permissionHandler', {
       request: req
     })
 
-    function use(fn) {
-      return new Promise((resolve, reject) => {
-        fn(req, res, (err) => err ? reject(err) : resolve())
-      })
-    }
+    const use = (fn) => new Promise((resolve, reject) =>
+      fn(req, res, (err) => err ? reject(err) : resolve())
+    )
 
     await use(session)
     await use(passport.initialize())
     await use(passport.session())
+
+    const t1 = (new Date()).getMilliseconds()
+
+    console.log("Getting user from Session took " + (t1 - t0) + " milliseconds.")
 
     console.log('req.user', req.user)
 
