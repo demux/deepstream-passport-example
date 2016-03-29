@@ -2,6 +2,7 @@ import path from 'path'
 
 import express from 'express'
 import passport from 'passport'
+import bodyParser from 'body-parser'
 
 import './auth'
 import session from './session'
@@ -10,15 +11,33 @@ import api from './api'
 
 export const app = express()
 
-app.use(passport.initialize())
-app.use(passport.session())
+app.use(bodyParser.json())
 
 app.use(session)
 
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.use('/api', api)
 
-app.use(express.static(path.join(__dirname, '../client')))
+const webpack = require('webpack')
+const webpackMiddleware = require('webpack-dev-middleware')
+const webpackDevConfig = require('../webpack.config.development')
 
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../public/index.html'))
-// })
+app.use(webpackMiddleware(webpack(webpackDevConfig), {
+  publicPath: '/',
+  contentBase: '../client/',
+  inline: true,
+  hot: true,
+  stats: {
+    colors: true,
+    hash: false,
+    timings: true,
+    chunks: false,
+    chunkModules: false,
+    modules: false
+  },
+  historyApiFallback: true,
+}))
+
+app.use(express.static(path.join(__dirname, '../client')))

@@ -1,6 +1,8 @@
 import express from 'express'
 import passport from 'passport'
 
+import User from './models/User'
+
 
 const api = express()
 
@@ -39,5 +41,13 @@ api.all('/logout', (req, res) => {
   req.logout()
   res.json({})
 })
+
+api.post('/create-user', async (req, res, next) => {
+  console.log(req.body)
+  const {username, password} = req.body
+  const user = await User.create(username, password)
+  res.json(user.getData())
+})
+
 
 export default api
