@@ -1,20 +1,27 @@
 import API from './api'
 import deepstreamClient from 'deepstream.io-client-js'
 
-window.ds = deepstreamClient('localhost:3000', {path: '/ds'})
 
-ds.login()
+function createDSClient() {
+  (typeof ds !== 'undefined') && ds.close()
+  window.ds = deepstreamClient('localhost:3000', {path: '/ds'})
+  ds.login()
+}
+createDSClient()
+
 
 window._dev = {
-  login(username, password) {
-    return API.custom('login').post({username, password}).then((res) => {
-      const user = res.body().data()
-      return user
-    })
+  async login(username, password) {
+    const res = await API.custom('login').post({username, password})
+    createDSClient()
+    const user = res.body().data()
+    console.log(user)
+    return user
   },
 
-  logout() {
-    return API.custom('logout').post()
+  async logout() {
+    await API.custom('logout').post()
+    createDSClient() // Login 'anon'
   },
 
   createUser(username, password) {
@@ -22,8 +29,9 @@ window._dev = {
   },
 
   async showUser() {
-    const res = await API.custom('user').get().then()
+    const res = await API.custom('user').get()
     const user = res.body().data()
     console.log(user)
+    return user
   },
 }
